@@ -1,0 +1,192 @@
+{
+ "actions": [],
+ "autoname": "format:BOD{YY}{MM}{DD}{######}",
+ "creation": "2026-08-15 16:14:31.390288",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "order_id",
+  "customer",
+  "address",
+  "start_time",
+  "end_time",
+  "assigned_worker",
+  "column_break_eqde",
+  "service_name",
+  "service_package",
+  "service_category",
+  "base_price",
+  "discount_price",
+  "platform_fee",
+  "grand_total"
+ ],
+ "fields": [
+  {
+   "fieldname": "service_name",
+   "fieldtype": "Link",
+   "label": "Service Name",
+   "options": "Service"
+  },
+  {
+   "fieldname": "service_package",
+   "fieldtype": "Link",
+   "label": "Service Package",
+   "link_filters": "[\n  [\"Service Package\", \"service_name\", \"=\", \"eval:doc.service_name\"]\n]",
+   "options": "Service Package"
+  },
+  {
+   "fetch_from": "service_name.service_category",
+   "fieldname": "service_category",
+   "fieldtype": "Read Only",
+   "label": "Service Category"
+  },
+  {
+   "fetch_from": "order_id.customer_id",
+   "fieldname": "customer",
+   "fieldtype": "Read Only",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Read Only",
+   "label": "Address"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "label": "Start Time",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Datetime",
+   "label": "End Time",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "column_break_eqde",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "service_package.base_price",
+   "fieldname": "base_price",
+   "fieldtype": "Currency",
+   "label": "Base Price",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "service_package.discount_price",
+   "fieldname": "discount_price",
+   "fieldtype": "Currency",
+   "label": "Discount Price",
+   "read_only": 1
+  },
+  {
+   "fieldname": "platform_fee",
+   "fieldtype": "Currency",
+   "label": "Platform Fee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "grand_total",
+   "fieldtype": "Currency",
+   "label": "Grand Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "assigned_worker",
+   "fieldtype": "Table MultiSelect",
+   "label": "Assigned Worker",
+   "options": "Worker Selection",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "order_id",
+   "fieldtype": "Link",
+   "label": "Order ID",
+   "options": "Order"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-16 16:23:47.765196",
+ "modified_by": "Administrator",
+ "module": "Servora",
+ "name": "Booking",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Customer",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Freelancer",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "permlevel": 2,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Freelancer",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

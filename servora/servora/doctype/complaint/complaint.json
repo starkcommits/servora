@@ -1,0 +1,83 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-08-15 17:22:12.356084",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "booking_id",
+  "customer_id",
+  "complaint_type",
+  "resolution",
+  "column_break_adnd",
+  "description",
+  "priority"
+ ],
+ "fields": [
+  {
+   "fieldname": "booking_id",
+   "fieldtype": "Link",
+   "label": "Booking ID",
+   "options": "Booking"
+  },
+  {
+   "fetch_from": "booking_id.customer",
+   "fieldname": "customer_id",
+   "fieldtype": "Read Only",
+   "label": "Customer ID"
+  },
+  {
+   "fieldname": "complaint_type",
+   "fieldtype": "Select",
+   "label": "Complaint Type",
+   "options": "\nQuality\nLate Arrival\nWorker Behaviour\nDamage\nPayment\nOther"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "label": "Priority",
+   "options": "\n0\n1\n2"
+  },
+  {
+   "fieldname": "column_break_adnd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "resolution",
+   "fieldtype": "Small Text",
+   "label": "Resolution"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-15 20:16:38.250701",
+ "modified_by": "Administrator",
+ "module": "Servora",
+ "name": "Complaint",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

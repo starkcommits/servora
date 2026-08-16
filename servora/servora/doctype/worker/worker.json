@@ -1,0 +1,107 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-08-15 16:06:58.383250",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "worker_name",
+  "mobile_number",
+  "email",
+  "date_of_joining",
+  "column_break_osno",
+  "employment_status",
+  "employment_type",
+  "skills",
+  "salary"
+ ],
+ "fields": [
+  {
+   "fieldname": "worker_name",
+   "fieldtype": "Data",
+   "label": "Worker Name"
+  },
+  {
+   "fieldname": "mobile_number",
+   "fieldtype": "Phone",
+   "label": "Mobile Number"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "date_of_joining",
+   "fieldtype": "Date",
+   "label": "Date of Joining"
+  },
+  {
+   "fieldname": "employment_status",
+   "fieldtype": "Select",
+   "label": "Employment Status",
+   "options": "\nActive\nOn Leave\nSuspended\nResigned"
+  },
+  {
+   "fieldname": "employment_type",
+   "fieldtype": "Select",
+   "label": "Employment Type",
+   "options": "\nFull Time\nPart Time"
+  },
+  {
+   "fieldname": "skills",
+   "fieldtype": "Table MultiSelect",
+   "label": "Skills",
+   "options": "Worker Skill"
+  },
+  {
+   "fieldname": "salary",
+   "fieldtype": "Currency",
+   "label": "Salary"
+  },
+  {
+   "fieldname": "column_break_osno",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-16 17:33:08.689187",
+ "modified_by": "Administrator",
+ "module": "Servora",
+ "name": "Worker",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Admin",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

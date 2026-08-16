@@ -1,0 +1,71 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-08-15 22:51:21.968634",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "service_package",
+  "service_name",
+  "booking_id",
+  "column_break_qkpx",
+  "base_price",
+  "discounted_price"
+ ],
+ "fields": [
+  {
+   "fieldname": "service_package",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Package",
+   "options": "Service Package"
+  },
+  {
+   "fetch_from": "service_package.service_name",
+   "fieldname": "service_name",
+   "fieldtype": "Read Only",
+   "in_list_view": 1,
+   "label": "Service Name"
+  },
+  {
+   "fetch_from": "service_package.base_price",
+   "fieldname": "base_price",
+   "fieldtype": "Read Only",
+   "in_list_view": 1,
+   "label": "Base Price"
+  },
+  {
+   "fieldname": "column_break_qkpx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "booking_id",
+   "fieldtype": "Link",
+   "label": "Booking ID",
+   "options": "Booking"
+  },
+  {
+   "fetch_from": "service_package.discount_price",
+   "fieldname": "discounted_price",
+   "fieldtype": "Read Only",
+   "in_list_view": 1,
+   "label": "Discounted Price"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-16 16:09:36.878871",
+ "modified_by": "Administrator",
+ "module": "Servora",
+ "name": "Cart Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,161 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-08-15 17:05:17.818684",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "booking_id",
+  "before_photos_section",
+  "before_photo1",
+  "before_photo2",
+  "before_photo3",
+  "column_break_ieac",
+  "before_photo4",
+  "before_photo5",
+  "before_photo6",
+  "after_photos_section",
+  "after_photo1",
+  "after_photo2",
+  "after_photo3",
+  "column_break_iqem",
+  "after_photo4",
+  "after_photo5",
+  "after_photo6",
+  "section_break_euyb",
+  "customer_rating",
+  "column_break_wxiu",
+  "customer_note"
+ ],
+ "fields": [
+  {
+   "fieldname": "booking_id",
+   "fieldtype": "Link",
+   "label": "Booking ID",
+   "options": "Booking"
+  },
+  {
+   "fieldname": "before_photos_section",
+   "fieldtype": "Section Break",
+   "label": "Before Photos"
+  },
+  {
+   "fieldname": "before_photo1",
+   "fieldtype": "Attach Image",
+   "label": "Before Photo1"
+  },
+  {
+   "fieldname": "before_photo2",
+   "fieldtype": "Attach Image",
+   "label": "Before Photo2"
+  },
+  {
+   "fieldname": "before_photo3",
+   "fieldtype": "Attach Image",
+   "label": "Before Photo3"
+  },
+  {
+   "fieldname": "column_break_ieac",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "before_photo4",
+   "fieldtype": "Attach Image",
+   "label": "Before Photo4"
+  },
+  {
+   "fieldname": "before_photo5",
+   "fieldtype": "Attach Image",
+   "label": "Before Photo5"
+  },
+  {
+   "fieldname": "before_photo6",
+   "fieldtype": "Attach Image",
+   "label": "Before Photo6"
+  },
+  {
+   "fieldname": "after_photos_section",
+   "fieldtype": "Section Break",
+   "label": "After Photos"
+  },
+  {
+   "fieldname": "after_photo1",
+   "fieldtype": "Attach Image",
+   "label": "After Photo1"
+  },
+  {
+   "fieldname": "after_photo2",
+   "fieldtype": "Attach Image",
+   "label": "After Photo2"
+  },
+  {
+   "fieldname": "after_photo3",
+   "fieldtype": "Attach Image",
+   "label": "After Photo3"
+  },
+  {
+   "fieldname": "column_break_iqem",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "after_photo4",
+   "fieldtype": "Attach Image",
+   "label": "After Photo4"
+  },
+  {
+   "fieldname": "after_photo5",
+   "fieldtype": "Attach Image",
+   "label": "After Photo5"
+  },
+  {
+   "fieldname": "after_photo6",
+   "fieldtype": "Attach Image",
+   "label": "After Photo6"
+  },
+  {
+   "fieldname": "section_break_euyb",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "customer_rating",
+   "fieldtype": "Rating",
+   "label": "Customer Rating"
+  },
+  {
+   "fieldname": "customer_note",
+   "fieldtype": "Data",
+   "label": "Customer Note"
+  },
+  {
+   "fieldname": "column_break_wxiu",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-15 17:13:28.989078",
+ "modified_by": "Administrator",
+ "module": "Servora",
+ "name": "Service Execution",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
