@@ -20,7 +20,14 @@ app_license = "mit"
 # 		"has_permission": "servora.api.permission.has_app_permission"
 # 	}
 # ]
-
+fixtures = [
+    {
+        "dt": "Workflow",
+        "filters": [
+            ["workflow_name", "in", ["Booking Flow", "Complaint Flow"]]
+        ]
+    }
+]
 # Includes in <head>
 # ------------------
 
