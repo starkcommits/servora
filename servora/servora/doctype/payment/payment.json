@@ -11,7 +11,8 @@
   "column_break_uyks",
   "customer_id",
   "transaction_id",
-  "payment_status"
+  "payment_status",
+  "amended_from"
  ],
  "fields": [
   {
@@ -56,12 +57,23 @@
    "label": "Order ID",
    "options": "Order",
    "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Payment",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2026-08-16 16:26:28.390588",
+ "modified": "2026-08-17 14:20:07.839204",
  "modified_by": "Administrator",
  "module": "Servora",
  "name": "Payment",

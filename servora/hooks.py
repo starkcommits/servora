@@ -1,3 +1,6 @@
+# Copyright (c) 2026, Servora and contributors
+# For license or other legal information, please see license.txt
+
 app_name = "servora"
 app_title = "Servora"
 app_publisher = "Servora"
@@ -24,10 +27,11 @@ fixtures = [
     {
         "dt": "Workflow",
         "filters": [
-            ["workflow_name", "in", ["Booking Flow", "Complaint Flow"]]
+            ["workflow_name", "in", ["Order Workflow", "Complaint Flow"]]
         ]
     }
 ]
+
 # Includes in <head>
 # ------------------
 
@@ -47,16 +51,17 @@ fixtures = [
 # webform_include_css = {"doctype": "public/css/doctype.css"}
 
 # include js in page
-# page_js = {"page" : "public/js/file.js"}
+# page_js = {"page": "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
-# doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
-# doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
+# doctype_js = {"doctype": "public/js/doctype.js"}
+# doctype_list_js = {"doctype": "public/js/doctype_list.js"}
+# doctype_tree_js = {"doctype": "public/js/doctype_tree.js"}
+# doctype_calendar_js = {"doctype": "public/js/doctype_calendar.js"}
 
 # Svg Icons
 # ------------------
+
 # include app icons in desk
 # app_include_icons = "servora/public/icons.svg"
 
@@ -100,6 +105,7 @@ fixtures = [
 
 # Integration Setup
 # ------------------
+
 # To set up dependencies/integrations with other apps
 # Name of the app being installed is passed as an argument
 
@@ -108,6 +114,7 @@ fixtures = [
 
 # Integration Cleanup
 # -------------------
+
 # To clean up dependencies/integrations with other apps
 # Name of the app being uninstalled is passed as an argument
 
@@ -116,24 +123,27 @@ fixtures = [
 
 # Desk Notifications
 # ------------------
+
 # See frappe.core.notifications.get_notification_config
 
 # notification_config = "servora.notifications.get_notification_config"
 
 # Permissions
 # -----------
+
 # Permissions evaluated in scripted ways
 
 # permission_query_conditions = {
 # 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
 # }
-#
+
 # has_permission = {
 # 	"Event": "frappe.desk.doctype.event.event.has_permission",
 # }
 
 # DocType Class
 # ---------------
+
 # Override standard doctype classes
 
 # override_doctype_class = {
@@ -142,6 +152,7 @@ fixtures = [
 
 # Document Events
 # ---------------
+
 # Hook on document methods and events
 
 # doc_events = {
@@ -180,6 +191,7 @@ fixtures = [
 
 # Overriding Methods
 # ------------------------------
+
 #
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "servora.event.get_events"
@@ -237,7 +249,7 @@ fixtures = [
 
 # Authentication and authorization
 # --------------------------------
-
+#
 # auth_hooks = [
 # 	"servora.auth.validate"
 # ]
@@ -254,3 +266,19 @@ fixtures = [
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
 
+# Before request/job events
+# ---------------------
+# before_request = ["servora.utils.before_request"]
+# after_request = ["servora.utils.after_request"]
+# before_job = ["servora.utils.before_job"]
+# after_job = ["servora.utils.after_job"]
+
+# Document events
+# ---------------
+# doc_events = {
+# 	"*": {
+# 		"on_submit": "servora.doctype.order.order.create_bookings",
+# 		"on_cancel": "method",
+# 		"on_trash": "method"
+# 	}
+# }

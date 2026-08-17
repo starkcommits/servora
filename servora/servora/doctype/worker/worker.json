@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": ".{worker_name}.-.{mobile_number}.-.##",
  "creation": "2026-08-15 16:06:58.383250",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -68,10 +69,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-16 17:33:08.689187",
+ "modified": "2026-08-17 04:20:08.476954",
  "modified_by": "Administrator",
  "module": "Servora",
  "name": "Worker",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

@@ -8,17 +8,15 @@
   "section_break_nbnv",
   "items",
   "section_break_meax",
-  "customer_id",
-  "amended_from",
-  "customer_name",
   "platform_fee",
   "grand_total",
-  "booking_ids",
+  "payment_collected",
+  "assigned_worker",
+  "payment_mode",
   "column_break_uhdx",
   "scheduled_at",
-  "status",
-  "payment_method",
-  "payment_status"
+  "start_time",
+  "finish_time"
  ],
  "fields": [
   {
@@ -36,24 +34,6 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "customer_id",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Customer ID",
-   "options": "Customer",
-   "unique": 1
-  },
-  {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Order",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
-  },
-  {
    "fieldname": "column_break_uhdx",
    "fieldtype": "Column Break"
   },
@@ -61,26 +41,6 @@
    "fieldname": "scheduled_at",
    "fieldtype": "Datetime",
    "label": "Scheduled At"
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "options": "\nDraft\nPending\nSubmitted",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "customer_id.first_name",
-   "fieldname": "customer_name",
-   "fieldtype": "Read Only",
-   "label": "Customer Name"
-  },
-  {
-   "fieldname": "payment_method",
-   "fieldtype": "Select",
-   "label": "Payment Method",
-   "options": "\nCOD\nUPI",
-   "read_only": 1
   },
   {
    "fieldname": "platform_fee",
@@ -95,30 +55,138 @@
    "read_only": 1
   },
   {
-   "fieldname": "payment_status",
-   "fieldtype": "Select",
-   "label": "Payment Status",
-   "options": "\nPending\nFailed\nSuccess",
-   "read_only": 1
+   "default": "0",
+   "fieldname": "payment_collected",
+   "fieldtype": "Check",
+   "label": "Payment Collected",
+   "permlevel": 2
   },
   {
-   "fieldname": "booking_ids",
+   "fieldname": "assigned_worker",
    "fieldtype": "Table MultiSelect",
-   "label": "Booking IDs",
-   "options": "Booking Table"
+   "label": "Assigned Worker",
+   "options": "Worker Selection",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "label": "Start Time",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "finish_time",
+   "fieldtype": "Datetime",
+   "label": "Finish Time",
+   "permlevel": 2
+  },
+  {
+   "default": "CASH",
+   "fieldname": "payment_mode",
+   "fieldtype": "Select",
+   "label": "Payment Mode",
+   "options": "\nCASH\nUPI",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
- "is_submittable": 1,
  "links": [],
- "modified": "2026-08-16 18:46:24.754998",
+ "modified": "2026-08-17 04:33:22.056978",
  "modified_by": "Administrator",
  "module": "Servora",
  "name": "Order",
  "naming_rule": "Expression (old style)",
  "owner": "Administrator",
- "permissions": [],
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Customer",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Customer",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Freelancer",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "permlevel": 2,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Freelancer",
+   "share": 1,
+   "write": 1
+  }
+ ],
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
