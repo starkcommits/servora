@@ -11,7 +11,8 @@
   "discount_price",
   "column_break_btuh",
   "description",
-  "is_active"
+  "is_active",
+  "package_image"
  ],
  "fields": [
   {
@@ -50,12 +51,17 @@
    "fieldname": "is_active",
    "fieldtype": "Check",
    "label": "Is Active"
+  },
+  {
+   "fieldname": "package_image",
+   "fieldtype": "Attach Image",
+   "label": "Package Image"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-15 21:55:57.788931",
+ "modified": "2026-08-17 18:08:16.751885",
  "modified_by": "Administrator",
  "module": "Servora",
  "name": "Service Package",
@@ -81,6 +87,15 @@
    "read": 1,
    "report": 1,
    "role": "Customer",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
    "share": 1
   }
  ],

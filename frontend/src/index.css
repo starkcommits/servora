@@ -1,0 +1,82 @@
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply antialiased overflow-x-hidden bg-white text-[#1C1C1C];
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* UC exact CSS variable values — near-monochrome */
+  :root {
+    --background: #ffffff;
+    --foreground: #1C1C1C;
+    --card: #ffffff;
+    --card-foreground: #1C1C1C;
+    --popover: #ffffff;
+    --popover-foreground: #1C1C1C;
+    --primary: #1C1C1C;           /* UC: buttons are dark, not purple */
+    --primary-foreground: #ffffff;
+    --secondary: #F5F5F5;
+    --secondary-foreground: #1C1C1C;
+    --muted: #F5F5F5;
+    --muted-foreground: #737373;
+    --accent: #F5F5F5;
+    --accent-foreground: #1C1C1C;
+    --destructive: #EF4444;
+    --border: #E8E8E8;
+    --input: #E8E8E8;
+    --ring: #1C1C1C;
+    --radius: 0.5rem;
+
+    /* UC brand accent — used ONLY on logo and one CTA, never as bg tint */
+    --uc-accent: #7C3AED;
+
+    /* shadcn sidebar vars */
+    --sidebar: #F9FAFB;
+    --sidebar-foreground: #1C1C1C;
+    --sidebar-primary: #1C1C1C;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #F5F5F5;
+    --sidebar-accent-foreground: #1C1C1C;
+    --sidebar-border: #E8E8E8;
+    --sidebar-ring: #1C1C1C;
+  }
+}
+
+@layer components {
+  /* UC card: white, hairline border, very subtle shadow */
+  .uc-card {
+    @apply bg-white border border-[#E8E8E8] rounded-xl;
+  }
+
+  /* UC section: plain white or light gray alternating */
+  .uc-section {
+    @apply py-12 md:py-16;
+  }
+
+  /* UC input */
+  .uc-input {
+    @apply border border-[#E8E8E8] rounded-lg px-4 py-2.5 text-sm text-[#1C1C1C] placeholder:text-[#A0A0A0] focus:outline-none focus:border-[#1C1C1C] bg-white transition-colors;
+  }
+}
+
+@layer utilities {
+  /* Scrollbar */
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-gray-200 rounded-full; }
+}

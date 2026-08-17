@@ -14,15 +14,19 @@ app_license = "mit"
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "servora",
-# 		"logo": "/assets/servora/logo.png",
-# 		"title": "Servora",
-# 		"route": "/servora",
-# 		"has_permission": "servora.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+		"name": "servora",
+		"logo": "/assets/frappe/images/frappe-favicon.svg",
+		"title": "Servora",
+		"route": "/frontend",
+	}
+]
+
+website_route_rules = [
+	{"from_route": "/frontend/<path:app_path>", "to_route": "frontend"},
+]
+
 fixtures = [
     {
         "dt": "Workflow",
@@ -69,12 +73,13 @@ fixtures = [
 # ----------
 
 # application home page (will override Website Settings)
-# home_page = "login"
+home_page = "frontend"
 
 # website user home page (by Role)
-# role_home_page = {
-# 	"Role": "home_page"
-# }
+role_home_page = {
+	"Customer": "frontend",
+	"Guest": "frontend"
+}
 
 # Generators
 # ----------

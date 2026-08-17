@@ -6,6 +6,7 @@
  "engine": "InnoDB",
  "field_order": [
   "category_name",
+  "category_image",
   "column_break_pzua",
   "status"
  ],
@@ -29,12 +30,17 @@
   {
    "fieldname": "column_break_pzua",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "category_image",
+   "fieldtype": "Attach Image",
+   "label": "Category Image"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-15 21:52:36.671284",
+ "modified": "2026-08-17 18:07:01.682134",
  "modified_by": "Administrator",
  "module": "Servora",
  "name": "Service Category",
@@ -60,6 +66,15 @@
    "read": 1,
    "report": 1,
    "role": "Customer",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
    "share": 1
   }
  ],

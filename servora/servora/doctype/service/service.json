@@ -7,6 +7,8 @@
  "field_order": [
   "service_name",
   "service_category",
+  "service_image",
+  "column_break_gjpz",
   "description"
  ],
  "fields": [
@@ -30,12 +32,21 @@
    "fieldname": "description",
    "fieldtype": "Small Text",
    "label": "Description"
+  },
+  {
+   "fieldname": "service_image",
+   "fieldtype": "Attach Image",
+   "label": "Service Image"
+  },
+  {
+   "fieldname": "column_break_gjpz",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-15 21:52:21.786060",
+ "modified": "2026-08-17 18:07:22.944448",
  "modified_by": "Administrator",
  "module": "Servora",
  "name": "Service",
@@ -61,6 +72,15 @@
    "read": 1,
    "report": 1,
    "role": "Customer",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
    "share": 1
   }
  ],
