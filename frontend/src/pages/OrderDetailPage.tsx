@@ -1,69 +1,34 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useOrderDetails } from '../hooks/useOrderDetails';
-import { useFrappePostCall } from 'frappe-react-sdk';
+import { useFrappeGetCall } from 'frappe-react-sdk';
 import { OrderStatusBadge } from '../components/orders/OrderStatusBadge';
-import { OrderTrackingTimeline } from '../components/orders/OrderTrackingTimeline';
 import { BillSummary } from '../components/cart/BillSummary';
 import { Button } from '../components/common/Button';
 import { Skeleton } from '../components/common/Skeleton';
+import { Booking } from '../types';
 import {
-  ArrowLeft,
   Calendar,
-  UserCheck,
   ShieldCheck,
-  CheckCircle2,
-  AlertCircle
+  ArrowRight,
+  Package2,
 } from 'lucide-react';
 
 export const OrderDetailPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const decodedOrderId = orderId ? decodeURIComponent(orderId) : '';
-  const { order, isLoading, error, refetch } = useOrderDetails(decodedOrderId);
+  const { order, isLoading, error } = useOrderDetails(decodedOrderId);
 
-  const [actionLoading, setActionLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
-
-  const { call: makePaymentCall } = useFrappePostCall('servora.api.make_payment');
-  const { call: customerConfirmCall } = useFrappePostCall('servora.api.customer_confirm_order');
-
-  const handleRetryPayment = async () => {
-    if (!order) return;
-    try {
-      setActionLoading(true);
-      setErrorMsg(null);
-      const res = await makePaymentCall({ order_id: order.name });
-      if (res && res.message && res.message.payment_url) {
-        window.location.href = res.message.payment_url;
-      } else {
-        setErrorMsg('Failed to generate payment gateway URL.');
-      }
-    } catch (err: any) {
-      console.error('Payment retry error:', err);
-      setErrorMsg(err?.message || 'Payment initiation failed.');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleCustomerConfirm = async () => {
-    if (!order) return;
-    try {
-      setActionLoading(true);
-      setErrorMsg(null);
-      const res = await customerConfirmCall({ order_id: order.name });
-      if (res && res.message && res.message.status === 'success') {
-        setSuccessMsg('Thank you! You have confirmed the completed service.');
-        await refetch();
-      }
-    } catch (err: any) {
-      console.error('Customer confirmation error:', err);
-      setErrorMsg(err?.message || 'Failed to confirm order completion.');
-    } finally {
-      setActionLoading(false);
-    }
-  };
+  // Fetch bookings linked to this order
+  const { data: bookingsData, isLoading: bookingsLoading } = useFrappeGetCall<{ message: Booking[] }>(
+    'servora.api.get_customer_bookings',
+    undefined,
+    decodedOrderId ? `bookings_for_order_${decodedOrderId}` : null,
+    { revalidateOnFocus: true }
+  );
+  const linkedBookings = (bookingsData?.message || []).filter(
+    (b) => b.order_id === decodedOrderId
+  );
 
   if (isLoading) {
     return (
@@ -81,13 +46,11 @@ export const OrderDetailPage: React.FC = () => {
         <h2 className="text-xl font-bold text-slate-900">Order Not Found</h2>
         <p className="text-sm text-slate-500">We could not locate this order in your account.</p>
         <Link to="/orders">
-          <Button variant="primary">View My Orders</Button>
+          <Button variant="primary">View My Bookings</Button>
         </Link>
       </div>
     );
   }
-
-  const assignedWorkers = order.assigned_worker || [];
 
   return (
     <div className="min-h-screen bg-slate-50 py-8 md:py-12 pb-24 md:pb-16">
@@ -95,135 +58,91 @@ export const OrderDetailPage: React.FC = () => {
 
         {/* Back Link & Header */}
         <div>
-          <Link
-            to="/orders"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors mb-3"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to all bookings</span>
-          </Link>
+
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
             <div className="space-y-1">
               <span className="text-xs uppercase font-bold text-slate-400 tracking-wider">
-                Booking Reference
+                Order Reference
               </span>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900 font-mono">
                 {order.name}
               </h1>
               <div className="flex items-center gap-3 text-xs text-slate-500 pt-1">
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-teal-600" />
-                  <span>Scheduled: <strong>{order.scheduled_at || 'Schedule Pending'}</strong></span>
-                </span>
+                {order.scheduled_at && (
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 text-teal-600" />
+                    <span>Scheduled: <strong>{order.scheduled_at}</strong></span>
+                  </span>
+                )}
               </div>
             </div>
 
             <div className="flex flex-col sm:items-end gap-2">
               <OrderStatusBadge status={order.workflow_state} size="md" />
               <span className="text-xs text-slate-400">
-                Created: {new Date(order.creation).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                Created: {new Date(order.creation).toLocaleDateString('en-IN', {
+                  day: 'numeric', month: 'short', year: 'numeric'
+                })}
               </span>
             </div>
           </div>
         </div>
 
-        {errorMsg && (
-          <div className="p-4 bg-red-50 text-red-700 text-sm rounded-2xl border border-red-200 flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 shrink-0" />
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        {successMsg && (
-          <div className="p-4 bg-emerald-50 text-emerald-800 text-sm rounded-2xl border border-emerald-200 flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" />
-            <span>{successMsg}</span>
-          </div>
-        )}
-
-        {/* Special Actions Banner */}
-        {order.workflow_state === 'Payment Pending' && (
-          <div className="bg-amber-50 border border-amber-200 p-5 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <h4 className="text-sm font-bold text-amber-900">Payment Pending</h4>
-              <p className="text-xs text-amber-700">Please complete online payment to confirm your booking.</p>
-            </div>
-            <Button
-              variant="primary"
-              size="md"
-              onClick={handleRetryPayment}
-              isLoading={actionLoading}
-              className="bg-amber-600 hover:bg-amber-700 text-white font-bold"
-            >
-              Pay Now (₹{Number(order.grand_total || 0).toLocaleString('en-IN')})
-            </Button>
-          </div>
-        )}
-
-        {order.workflow_state === 'Completed' && (
-          <div className="bg-emerald-50 border border-emerald-200 p-5 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <h4 className="text-sm font-bold text-emerald-900">Service Completed!</h4>
-              <p className="text-xs text-emerald-700">Our professional has finished the job. Please confirm your satisfaction.</p>
-            </div>
-            <Button
-              variant="primary"
-              size="md"
-              onClick={handleCustomerConfirm}
-              isLoading={actionLoading}
-              className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold"
-              leftIcon={<CheckCircle2 className="w-4 h-4" />}
-            >
-              Confirm Service Completed
-            </Button>
-          </div>
-        )}
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-          {/* Left Tracking & Details */}
+          {/* Left: Linked Bookings */}
           <div className="lg:col-span-7 space-y-6">
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <Package2 className="w-4 h-4 text-[#7C3AED]" />
+                Service Bookings ({linkedBookings.length})
+              </h3>
+              <p className="text-xs text-slate-500">
+                Each service in this order has a separate booking. Click a booking to track its progress, view photos, and rate the service.
+              </p>
 
-            {/* Live Progress Timeline */}
-            <OrderTrackingTimeline
-              workflowState={order.workflow_state}
-              startTime={order.start_time}
-              finishTime={order.finish_time}
-            />
-
-            {/* Assigned Professionals */}
-            {assignedWorkers.length > 0 && (
-              <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-3">
-                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <UserCheck className="w-4 h-4 text-teal-700" />
-                  <span>Assigned Professional</span>
-                </h3>
-                <div className="space-y-2 pt-1">
-                  {assignedWorkers.map((w, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-teal-100 text-teal-800 font-bold flex items-center justify-center text-sm">
-                          {w.worker.substring(0, 2).toUpperCase()}
+              {bookingsLoading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-16 w-full rounded-2xl" />
+                  <Skeleton className="h-16 w-full rounded-2xl" />
+                </div>
+              ) : linkedBookings.length > 0 ? (
+                <div className="space-y-3">
+                  {linkedBookings.map((booking) => (
+                    <Link
+                      key={booking.name}
+                      to={`/bookings/${encodeURIComponent(booking.name)}`}
+                      className="flex items-center justify-between p-4 bg-[#FAFAFA] rounded-2xl border border-[#E8E8E8] hover:border-[#7C3AED] hover:shadow-sm transition-all group"
+                    >
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <OrderStatusBadge status={booking.workflow_state} size="sm" />
                         </div>
-                        <div>
-                          <div className="text-sm font-bold text-slate-900">Verified Service Pro</div>
-                          <div className="text-xs text-slate-500 font-mono">ID: {w.worker}</div>
+                        <div className="text-sm font-bold text-[#1C1C1C] group-hover:text-[#7C3AED] transition-colors">
+                          {booking.pack_name || booking.service_package}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          ₹{Number(booking.grand_total || 0).toLocaleString('en-IN')}
                         </div>
                       </div>
-                      <span className="text-xs font-bold text-teal-700 bg-teal-50 px-2.5 py-1 rounded-full border border-teal-200">
-                        Assigned
-                      </span>
-                    </div>
+                      <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#7C3AED] group-hover:translate-x-1 transition-all shrink-0" />
+                    </Link>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="text-center py-6 text-xs text-slate-400">
+                  {order.workflow_state === 'Draft'
+                    ? 'Bookings will be created after you place the order.'
+                    : 'No bookings found for this order.'}
+                </div>
+              )}
+            </div>
 
-            {/* Booked Services List */}
+            {/* Ordered Services Summary */}
             <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
-                Services Booked ({order.items.length})
+                Services in Order ({order.items.length})
               </h3>
               <div className="divide-y divide-slate-100">
                 {order.items.map((item, idx) => (
@@ -241,7 +160,7 @@ export const OrderDetailPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Bill & Payment Status */}
+          {/* Right: Bill + Payment */}
           <div className="lg:col-span-5 space-y-5">
             <BillSummary order={order} />
 
@@ -252,13 +171,7 @@ export const OrderDetailPage: React.FC = () => {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-500">Method:</span>
                 <span className="font-bold text-slate-900">
-                  {order.payment_mode === 'CASH' ? 'Cash On Delivery' : 'Online Payment (UPI)'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-500">Status:</span>
-                <span className="font-bold text-teal-800">
-                  {order.payment_collected ? 'Payment Received' : (order.payment_mode === 'CASH' ? 'Pay on completion' : 'Verified')}
+                  {order.payment_mode === 'COD' ? 'Cash On Delivery' : 'Online Payment (UPI)'}
                 </span>
               </div>
             </div>

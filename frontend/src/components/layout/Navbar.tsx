@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useFrappeAuth } from 'frappe-react-sdk';
 import { useCart } from '../../context/CartContext';
 import {
   ShoppingCart,
   User,
-  Menu,
   X,
+  Search,
   MapPin,
   ChevronDown,
-  CalendarCheck,
-  RotateCcw,
-  LogOut,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { ServiceCategoryDialog, CATEGORY_DIALOGS } from '../home/ServiceCategoryDialog';
@@ -31,11 +28,11 @@ const ServoraLogo = () => (
 );
 
 export const Navbar: React.FC = () => {
-  const { currentUser, logout } = useFrappeAuth();
+  const { currentUser } = useFrappeAuth();
   const { itemsCount } = useCart();
   const { profile, refetch: refetchProfile } = useCustomerProfile();
   const location = useLocation();
-  const navigate = useNavigate();
+
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDialog, setActiveDialog] = useState<CategoryDialogData | null>(null);
@@ -88,13 +85,6 @@ export const Navbar: React.FC = () => {
   }, []);
 
   useEffect(() => setMobileOpen(false), [location.pathname]);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch {}
-  };
 
   const NAV_ITEMS = [
     { label: 'Home', to: '/', isCategory: false },
@@ -201,13 +191,13 @@ export const Navbar: React.FC = () => {
               </Link>
             )}
 
-            {/* Mobile hamburger */}
+            {/* Mobile Search Toggle */}
             <button
               onClick={() => setMobileOpen((v) => !v)}
               className="lg:hidden p-2 text-[#525252] hover:text-[#1C1C1C] transition-colors"
-              aria-label="Toggle navigation menu"
+              aria-label="Toggle search"
             >
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -215,90 +205,8 @@ export const Navbar: React.FC = () => {
         {/* Mobile menu drawer */}
         {mobileOpen && (
           <div className="lg:hidden border-t border-[#E8E8E8] bg-white animate-fade-in shadow-xl">
-            <div className="px-4 pt-3 pb-2">
+            <div className="px-4 pt-3 pb-3">
               <GlobalSearch onSelect={() => setMobileOpen(false)} />
-            </div>
-
-            <div className="px-4 pb-4 space-y-1 divide-y divide-[#F5F5F5]">
-              {/* Home */}
-              <Link
-                to="/"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3 py-3 text-[14px] font-semibold text-[#1C1C1C] hover:text-[#7C3AED] transition-colors"
-              >
-                Home
-              </Link>
-
-              {/* Saved Addresses */}
-              <button
-                onClick={() => {
-                  setMobileOpen(false);
-                  setLocationModalOpen(true);
-                }}
-                className="flex items-center gap-3 w-full text-left py-3 text-[14px] font-semibold text-[#1C1C1C] hover:text-[#7C3AED] transition-colors"
-              >
-                <MapPin className="w-4 h-4 text-[#7C3AED]" />
-                <span>Saved Addresses</span>
-              </button>
-
-              {/* Your Bookings */}
-              <Link
-                to="/orders"
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3 py-3 text-[14px] font-semibold text-[#1C1C1C] hover:text-[#7C3AED] transition-colors"
-              >
-                <CalendarCheck className="w-4 h-4 text-[#1C1C1C]" />
-                <span>Your Bookings</span>
-              </Link>
-
-              {/* My Refunds */}
-              <button
-                onClick={() => {
-                  setMobileOpen(false);
-                  setRefundModalOpen(true);
-                }}
-                className="flex items-center gap-3 w-full text-left py-3 text-[14px] font-semibold text-[#1C1C1C] hover:text-[#059669] transition-colors"
-              >
-                <RotateCcw className="w-4 h-4 text-[#059669]" />
-                <span>My Refunds</span>
-              </button>
-
-              {/* Profile & Auth */}
-              {isLoggedIn ? (
-                <div className="pt-2 space-y-1">
-                  <Link
-                    to="/profile"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 py-2.5 text-[14px] font-semibold text-[#1C1C1C]"
-                  >
-                    <div className="w-5 h-5 rounded-full bg-[#1C1C1C] text-white flex items-center justify-center text-[10px] font-bold">
-                      {userDisplayName[0].toUpperCase()}
-                    </div>
-                    <span>My Profile ({userDisplayName})</span>
-                  </Link>
-                  <button
-                    onClick={() => {
-                      setMobileOpen(false);
-                      handleLogout();
-                    }}
-                    className="flex items-center gap-2 py-2 text-xs font-semibold text-[#EF4444] w-full text-left"
-                  >
-                    <LogOut className="w-3.5 h-3.5" />
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <div className="pt-3">
-                  <Link
-                    to="/login"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#1C1C1C] hover:bg-[#333333] text-white text-[13px] font-bold rounded-xl transition-colors shadow-sm"
-                  >
-                    <User className="w-4 h-4" />
-                    <span>Sign In</span>
-                  </Link>
-                </div>
-              )}
             </div>
           </div>
         )}

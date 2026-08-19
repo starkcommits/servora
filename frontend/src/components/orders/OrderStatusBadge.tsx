@@ -4,6 +4,7 @@ import { cn } from '../../lib/utils';
 // UC accurate status badge — muted colors, small pill
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   'Draft':              { label: 'Draft',           className: 'bg-[#F5F5F5] text-[#737373] border-[#E8E8E8]' },
+  'Submitted':          { label: 'Processing',      className: 'bg-[#EFF6FF] text-[#1D4ED8] border-[#BFDBFE]' },
   'Payment Pending':    { label: 'Payment Pending', className: 'bg-[#FFFBEB] text-[#92400E] border-[#FDE68A]' },
   'Confirmed':          { label: 'Confirmed',       className: 'bg-[#EFF6FF] text-[#1D4ED8] border-[#BFDBFE]' },
   'Assigned':           { label: 'Assigned',        className: 'bg-[#F5F3FF] text-[#5B21B6] border-[#DDD6FE]' },

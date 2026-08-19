@@ -21,58 +21,17 @@ interface LocationItem {
   subtitle: string;
 }
 
-// Popular locations & societies for fast search & suggestions
 const POPULAR_LOCATIONS: LocationItem[] = [
   {
     id: '1',
-    title: 'The First Brick Apartment',
-    subtitle: 'near Sunder Farm House, Sarfabad, Sector 73, Noida, Uttar Pradesh, India',
+    title: 'Sector 73, Noida',
+    subtitle: 'Sarfabad, Sector 73, Noida, Uttar Pradesh, India - 201301',
   },
   {
     id: '2',
-    title: 'Hiranandani Gardens',
-    subtitle: 'Cliff Ave, Central Avenue, Powai, Mumbai, Maharashtra 400076',
-  },
-  {
-    id: '3',
-    title: 'Prestige Shantiniketan',
-    subtitle: 'ITPL Main Road, Whitefield, Bengaluru, Karnataka 560048',
-  },
-  {
-    id: '4',
-    title: 'DLF Phase 5',
-    subtitle: 'Golf Course Road, Sector 54, Gurugram, Haryana 122002',
-  },
-  {
-    id: '5',
-    title: 'Indiranagar 100ft Road',
-    subtitle: 'Near CMH Hospital, HAL 2nd Stage, Bengaluru, Karnataka 560038',
-  },
-  {
-    id: '6',
-    title: 'Godrej Woods',
-    subtitle: 'Sector 43, Noida, Gautam Buddha Nagar, Uttar Pradesh 201301',
-  },
-  {
-    id: '7',
-    title: 'Koramangala 4th Block',
-    subtitle: '80 Feet Road, Sony World Junction, Bengaluru, Karnataka 560034',
-  },
-  {
-    id: '8',
-    title: 'Bandra West (Pali Hill)',
-    subtitle: 'Dr. Ambedkar Road, Bandra West, Mumbai, Maharashtra 400050',
-  },
-  {
-    id: '9',
-    title: 'Banjara Hills Road No 12',
-    subtitle: 'Near MLA Colony, Hyderabad, Telangana 500034',
-  },
-  {
-    id: '10',
-    title: 'Amanora Park Town',
-    subtitle: 'Magarpatta Road, Hadapsar, Pune, Maharashtra 411028',
-  },
+    title: 'Sector 73, Noida',
+    subtitle: 'Near Sunder Farm House, Noida, Uttar Pradesh, India - 201307',
+  }
 ];
 
 const RECENTS_KEY = 'servora_recent_locations';
@@ -101,9 +60,9 @@ export const AddressManagerModal: React.FC<AddressManagerModalProps> = ({
   const [recents, setRecents] = useState<LocationItem[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<LocationItem | null>(null);
 
-  // Details form fields
   const [houseflatNo, setHouseflatNo] = useState('');
   const [landmark, setLandmark] = useState('');
+  const [pincode, setPincode] = useState('');
   const [savedAs, setSavedAs] = useState<'Home' | 'Work' | 'Other'>('Home');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
@@ -138,6 +97,7 @@ export const AddressManagerModal: React.FC<AddressManagerModalProps> = ({
       setSelectedLocation(null);
       setHouseflatNo('');
       setLandmark('');
+      setPincode('');
       setSavedAs('Home');
       setErrorMsg(null);
       document.body.style.overflow = 'hidden';
@@ -162,6 +122,11 @@ export const AddressManagerModal: React.FC<AddressManagerModalProps> = ({
     setSelectedLocation(loc);
     setErrorMsg(null);
 
+    // Try to extract 6-digit pincode from subtitle
+    const pincodeMatch = loc.subtitle.match(/\b\d{6}\b/);
+    const extractedPincode = pincodeMatch ? pincodeMatch[0] : '';
+    setPincode(extractedPincode);
+
     // Save to recents and active guest location
     const updatedRecents = [loc, ...recents.filter((r) => r.id !== loc.id)].slice(0, 4);
     setRecents(updatedRecents);
@@ -173,6 +138,7 @@ export const AddressManagerModal: React.FC<AddressManagerModalProps> = ({
           title: loc.title,
           subtitle: loc.subtitle,
           location: `${loc.title}, ${loc.subtitle}`,
+          pincode: extractedPincode,
           houseflat_no: '',
         })
       );
@@ -210,7 +176,7 @@ export const AddressManagerModal: React.FC<AddressManagerModalProps> = ({
           const fallbackLoc: LocationItem = {
             id: 'geo-fallback',
             title: 'Current Location',
-            subtitle: 'Near Metro Station, Sector 73, Noida, Uttar Pradesh, India',
+            subtitle: 'Near Metro Station, Sector 73, Noida, Uttar Pradesh, India - 201301',
           };
           handleSelectLocation(fallbackLoc);
         },
@@ -226,6 +192,10 @@ export const AddressManagerModal: React.FC<AddressManagerModalProps> = ({
     e.preventDefault();
     if (!houseflatNo.trim()) {
       setErrorMsg('Please enter your house/flat/floor/building details.');
+      return;
+    }
+    if (!pincode.trim() || pincode.trim().length !== 6) {
+      setErrorMsg('Could not detect a valid Pincode for this location. Please try searching with a pincode.');
       return;
     }
     if (!selectedLocation) {
@@ -247,6 +217,7 @@ export const AddressManagerModal: React.FC<AddressManagerModalProps> = ({
             title: selectedLocation.title,
             subtitle: selectedLocation.subtitle,
             location: fullLocationString,
+            pincode: pincode.trim(),
             houseflat_no: houseflatNo.trim(),
             saved_as: savedAs,
           })
@@ -264,6 +235,7 @@ export const AddressManagerModal: React.FC<AddressManagerModalProps> = ({
       const res = await saveAddressCall({
         houseflat_no: houseflatNo.trim(),
         location: fullLocationString,
+        pincode: pincode.trim(),
         saved_as: savedAs,
         is_current: 1,
       });
@@ -615,6 +587,8 @@ export const AddressManagerModal: React.FC<AddressManagerModalProps> = ({
                   className="w-full px-3.5 py-2.5 bg-[#FAFAFA] border border-[#E8E8E8] rounded-xl text-[13px] text-[#1C1C1C] placeholder:text-[#A0A0A0] focus:outline-none focus:bg-white focus:border-[#1C1C1C] transition-all"
                 />
               </div>
+
+              {/* Pincode Auto-Fetched (Hidden or Readonly representation can be omitted as user requested not to ask) */}
 
               {/* Landmark / Directions */}
               <div>

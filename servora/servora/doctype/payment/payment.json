@@ -6,6 +6,7 @@
  "engine": "InnoDB",
  "field_order": [
   "order_id",
+  "booking_id",
   "amount",
   "payment_method",
   "column_break_uyks",
@@ -67,13 +68,19 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "booking_id",
+   "fieldtype": "Link",
+   "label": "Booking ID",
+   "options": "Booking"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-08-17 14:20:07.839204",
+ "modified": "2026-08-19 01:55:19.489971",
  "modified_by": "Administrator",
  "module": "Servora",
  "name": "Payment",

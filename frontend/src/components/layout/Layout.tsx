@@ -3,6 +3,8 @@ import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { MobileBottomBar } from './MobileBottomBar';
+import { OfflineBanner } from '../common/OfflineBanner';
+import { InstallPrompt } from '../common/InstallPrompt';
 
 export const Layout: React.FC = () => {
   return (
@@ -13,6 +15,8 @@ export const Layout: React.FC = () => {
       </main>
       <Footer />
       <MobileBottomBar />
+      <OfflineBanner />
+      <InstallPrompt />
     </div>
   );
 };

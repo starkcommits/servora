@@ -60,7 +60,7 @@ export const OrderSuccessPage: React.FC = () => {
             <div className="flex items-center justify-between text-xs sm:text-sm pt-2 border-t border-slate-200/80">
               <span className="text-slate-500 font-medium">Payment Mode:</span>
               <span className="font-bold text-slate-900">
-                {order?.payment_mode === 'CASH' ? 'Cash on Delivery' : 'Online Payment (UPI)'}
+                {order?.payment_mode === 'COD' ? 'Cash on Delivery' : 'Online Payment (UPI)'}
               </span>
             </div>
           </div>

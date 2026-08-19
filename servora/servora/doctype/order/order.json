@@ -9,14 +9,12 @@
   "items",
   "section_break_meax",
   "platform_fee",
+  "subtotal",
   "grand_total",
-  "payment_collected",
-  "assigned_worker",
+  "paid",
   "payment_mode",
   "column_break_uhdx",
-  "scheduled_at",
-  "start_time",
-  "finish_time"
+  "scheduled_at"
  ],
  "fields": [
   {
@@ -56,43 +54,27 @@
   },
   {
    "default": "0",
-   "fieldname": "payment_collected",
+   "fieldname": "paid",
    "fieldtype": "Check",
-   "label": "Payment Collected",
+   "label": "Paid",
    "permlevel": 2
   },
   {
-   "fieldname": "assigned_worker",
-   "fieldtype": "Table MultiSelect",
-   "label": "Assigned Worker",
-   "options": "Worker Selection",
-   "permlevel": 1
+   "fieldname": "subtotal",
+   "fieldtype": "Currency",
+   "label": "Subtotal"
   },
   {
-   "fieldname": "start_time",
-   "fieldtype": "Datetime",
-   "label": "Start Time",
-   "permlevel": 2
-  },
-  {
-   "fieldname": "finish_time",
-   "fieldtype": "Datetime",
-   "label": "Finish Time",
-   "permlevel": 2
-  },
-  {
-   "default": "CASH",
    "fieldname": "payment_mode",
    "fieldtype": "Select",
    "label": "Payment Mode",
-   "options": "\nCASH\nUPI",
-   "read_only": 1
+   "options": "\nCOD\nUPI"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-17 04:33:22.056978",
+ "modified": "2026-08-19 02:11:24.652208",
  "modified_by": "Administrator",
  "module": "Servora",
  "name": "Order",

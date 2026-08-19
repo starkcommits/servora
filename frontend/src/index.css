@@ -15,6 +15,17 @@
   body {
     @apply antialiased overflow-x-hidden bg-white text-[#1C1C1C];
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-touch-callout: none; /* Disable iOS context menu on long press */
+    -webkit-user-select: none;   /* Disable text selection */
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  input, textarea {
+    -webkit-user-select: auto;
+    user-select: auto;
   }
 
   /* UC exact CSS variable values — near-monochrome */
@@ -79,4 +90,23 @@
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { @apply bg-gray-200 rounded-full; }
+
+  .bg-dot-pattern {
+    background-color: #FAFAFA;
+    background-image: 
+      radial-gradient(circle at center, transparent 0%, #FAFAFA 80%),
+      radial-gradient(#d1d5db 1.5px, transparent 1.5px);
+    background-size: 100% 100%, 20px 20px;
+    background-position: center center, 0 0;
+    animation: move-dots 20s linear infinite;
+  }
+
+  @keyframes move-dots {
+    0% {
+      background-position: center center, 0 0;
+    }
+    100% {
+      background-position: center center, 20px 20px;
+    }
+  }
 }

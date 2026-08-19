@@ -31,7 +31,7 @@ fixtures = [
     {
         "dt": "Workflow",
         "filters": [
-            ["workflow_name", "in", ["Order Workflow", "Complaint Flow"]]
+            ["workflow_name", "in", ["Order Workflow","Booking Workflow", "Complaint Flow"]]
         ]
     }
 ]

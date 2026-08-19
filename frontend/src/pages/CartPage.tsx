@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useFrappeAuth, useFrappePostCall } from 'frappe-react-sdk';
 import { useCustomerProfile } from '../hooks/useCustomerProfile';
-import { useQueryClient } from '@tanstack/react-query';
 import { BillSummary } from '../components/cart/BillSummary';
 import { SlotSelector } from '../components/checkout/SlotSelector';
 import { PaymentMethodSelector } from '../components/checkout/PaymentMethodSelector';
@@ -28,13 +27,24 @@ export const CartPage: React.FC = () => {
   const { currentUser } = useFrappeAuth();
   const { profile, refetch: refetchProfile } = useCustomerProfile();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const [paymentMethod, setPaymentMethod] = useState<'COD' | 'UPI'>('COD');
   const [avoidCalling, setAvoidCalling] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [addressError, setAddressError] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const { call: confirmCodCall } = useFrappePostCall('servora.api.confirm_cod_order');
   const { call: makePaymentCall } = useFrappePostCall('servora.api.make_payment');
@@ -45,7 +55,7 @@ export const CartPage: React.FC = () => {
   const currentAddress = addresses.find((a) => a.is_current === 1) || addresses[0];
   const isAddressSelected = Boolean(currentAddress);
   const isSlotSelected = Boolean(cart?.scheduled_at);
-  const canPlaceOrder = isLoggedIn && isAddressSelected && isSlotSelected;
+  const canPlaceOrder = isLoggedIn && isAddressSelected && isSlotSelected && isOnline;
 
   // Calculate total savings
   let totalSavings = 0;
@@ -91,6 +101,13 @@ export const CartPage: React.FC = () => {
       return;
     }
 
+    const scheduledDateStr = cart.scheduled_at.replace(' ', 'T'); // Convert to ISO 8601 compatible
+    const scheduledDate = new Date(scheduledDateStr);
+    if (scheduledDate < new Date()) {
+      setErrorMsg('The selected time slot has already passed. Please select a future date and time slot.');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       setErrorMsg(null);
@@ -101,7 +118,6 @@ export const CartPage: React.FC = () => {
         if (res?.message?.status === 'success') {
           clearCart();
           await refreshCart();
-          queryClient.invalidateQueries({ queryKey: ['cart'] });
           navigate(`/orders/${encodeURIComponent(confirmedOrderId)}/success`, {
             state: { order: res.message },
           });
@@ -347,7 +363,9 @@ export const CartPage: React.FC = () => {
               <div className="p-3 bg-[#FFFBEB] border border-[#FDE68A] rounded-xl text-[12px] text-[#92400E] font-medium flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-[#D97706] shrink-0" />
                 <span>
-                  {!isLoggedIn
+                  {!isOnline 
+                    ? 'You are offline. Reconnect to place your order.'
+                    : !isLoggedIn
                     ? 'Please login to proceed with your booking.'
                     : !isAddressSelected
                       ? 'Please add or select a service address above.'
@@ -372,7 +390,9 @@ export const CartPage: React.FC = () => {
               ) : (
                 <>
                   <span>
-                    {!isLoggedIn
+                    {!isOnline
+                      ? 'Offline'
+                      : !isLoggedIn
                       ? 'Login to Place Order'
                       : !isAddressSelected
                         ? 'Select Address to Proceed'

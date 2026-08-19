@@ -73,6 +73,11 @@ def add_to_cart(service_package, order_id=None):
 		"doctype": "Cart Item",
 		"service_package": service_package
 	})
+
+	# Reset stale payment_mode value that no longer matches allowed options
+	if order.payment_mode not in ("", "COD", "UPI"):
+		order.payment_mode = ""
+
 	order.save()
 	return order
 
@@ -102,6 +107,11 @@ def remove_from_cart(service_package, order_id=None):
 
 	# Filter out matching items
 	order.items = [item for item in order.items if item.service_package != service_package and item.name != service_package]
+
+	# Reset stale payment_mode value
+	if order.payment_mode not in ("", "COD", "UPI"):
+		order.payment_mode = ""
+
 	order.save()
 	return order
 
@@ -124,9 +134,29 @@ def set_order_schedule(order_id, scheduled_at):
 	return order
 
 
+def _validate_customer_serviceability(user):
+	customer = _get_customer_for_user(user)
+	if not customer:
+		frappe.throw(_("Customer profile not found."))
+	
+	current_addr = next((a for a in customer.address if a.is_current), None)
+	if not current_addr and len(customer.address) > 0:
+		current_addr = customer.address[0]
+
+	if not current_addr:
+		frappe.throw(_("Please add a service address before placing the order."))
+	
+	if not current_addr.pincode:
+		frappe.throw(_("Please update your address with a valid pincode."))
+		
+	is_serviceable = frappe.db.get_value("Serviceable Pincode", {"pincode": current_addr.pincode, "is_active": 1}, "name")
+	if not is_serviceable:
+		frappe.throw(_("Sorry, your current address (Pincode: {0}) is outside our serviceable area. We are expanding soon!").format(current_addr.pincode))
+
+
 @frappe.whitelist()
 def confirm_cod_order(order_id):
-	"""Place an order using Cash On Delivery and transition to Confirmed."""
+	"""Place an order using Cash On Delivery and transition to Submitted (which triggers create_bookings)."""
 	if frappe.session.user == "Guest":
 		frappe.throw(_("Please log in to place an order."), frappe.AuthenticationError)
 
@@ -143,30 +173,14 @@ def confirm_cod_order(order_id):
 	if not order.scheduled_at:
 		frappe.throw(_("Please select a service slot before placing the order."))
 
-	order.payment_mode = "CASH"
+	_validate_customer_serviceability(order.owner)
+
+	order.payment_mode = "COD"
 	order.save()
 
-	# Transition workflow state: Draft -> Confirmed via 'Cash On Delivery'
+	# Transition workflow state: Draft -> Submitted via 'Cash On Delivery'
+	# This triggers order.create_bookings() which creates per-service Booking + Payment docs
 	order = apply_workflow(order, "Cash On Delivery")
-
-	# Create Payment record for COD tracking
-	existing_payment = frappe.db.exists(
-		"Payment",
-		{
-			"order_id": order.name,
-			"payment_method": "COD"
-		}
-	)
-
-	if not existing_payment:
-		payment = frappe.get_doc({
-			"doctype": "Payment",
-			"order_id": order.name,
-			"amount": order.grand_total,
-			"payment_method": "COD",
-			"payment_status": "Pending"
-		})
-		payment.insert(ignore_permissions=True)
 
 	return {
 		"status": "success",
@@ -174,7 +188,7 @@ def confirm_cod_order(order_id):
 		"workflow_state": order.workflow_state,
 		"grand_total": order.grand_total,
 		"scheduled_at": order.scheduled_at,
-		"payment_mode": "CASH"
+		"payment_mode": "COD"
 	}
 
 
@@ -196,6 +210,8 @@ def make_payment(order_id):
 
 	if not order.scheduled_at:
 		frappe.throw(_("Please select a service slot."))
+
+	_validate_customer_serviceability(order.owner)
 
 	if order.workflow_state == "Draft":
 		order.payment_mode = "UPI"
@@ -275,24 +291,27 @@ def customer_confirm_order(order_id):
 
 @frappe.whitelist()
 def get_customer_profile():
-	"""Get current customer profile with order statistics."""
+	"""Get current customer profile with booking statistics."""
 	if frappe.session.user == "Guest":
 		return None
 
 	customer = _get_customer_for_user()
 	user = frappe.get_doc("User", frappe.session.user)
 
-	# Calculate summary statistics (excluding Draft carts)
-	orders = frappe.get_all(
-		"Order",
-		filters={"owner": frappe.session.user, "workflow_state": ["!=", "Draft"]},
-		fields=["name", "workflow_state", "grand_total", "creation"]
-	)
+	# Stats are now based on Bookings (one per service), not Orders
+	bookings = frappe.get_all(
+		"Booking",
+		filters={"customer_id": customer.name if customer else "__nonexistent__"},
+		fields=["name", "workflow_state"]
+	) if customer else []
 
-	total_orders = len(orders)
-	completed_orders = len([o for o in orders if o.workflow_state in ["Completed", "Customer Confirmed"]])
-	pending_orders = len([o for o in orders if o.workflow_state in ["Confirmed", "Assigned", "On The Way", "Started", "Payment Pending"]])
-	refunded_orders = len([o for o in orders if o.workflow_state in ["Cancelled", "Refunded"]])
+	total_bookings = len(bookings)
+	active_bookings = len([b for b in bookings if b.get("workflow_state") in [
+		"Confirmed", "Assigned", "On The Way", "Started"
+	]])
+	completed_bookings = len([b for b in bookings if b.get("workflow_state") in [
+		"Completed", "Customer Confirmed"
+	]])
 	saved_addresses_count = len(customer.address) if (customer and getattr(customer, "address", None)) else 0
 
 	return {
@@ -305,12 +324,132 @@ def get_customer_profile():
 		},
 		"customer": customer.as_dict() if customer else None,
 		"stats": {
-			"total_orders": total_orders,
-			"completed_orders": completed_orders,
-			"pending_orders": pending_orders,
-			"refunded_orders": refunded_orders,
+			"total_bookings": total_bookings,
+			"active_bookings": active_bookings,
+			"completed_bookings": completed_bookings,
 			"saved_addresses_count": saved_addresses_count
 		}
+	}
+
+
+@frappe.whitelist()
+def get_customer_bookings():
+	"""Get all bookings for the logged-in customer."""
+	if frappe.session.user == "Guest":
+		frappe.throw(_("Please log in to view bookings."), frappe.AuthenticationError)
+
+	customer = _get_customer_for_user()
+	if not customer:
+		return []
+
+	bookings = frappe.get_all(
+		"Booking",
+		filters={"customer_id": customer.name},
+		fields=[
+			"name", "order_id", "service_package", "workflow_state",
+			"scheduled_at", "grand_total", "discounted_price", "platform_fee",
+			"base_price", "paid", "creation"
+		],
+		order_by="creation desc",
+		limit=200
+	)
+
+	# Enrich with service package name
+	for b in bookings:
+		pkg = frappe.db.get_value(
+			"Service Package", b["service_package"],
+			["pack_name", "package_image"], as_dict=True
+		) if b.get("service_package") else None
+		b["pack_name"] = pkg.pack_name if pkg else b.get("service_package", "")
+		b["package_image"] = pkg.package_image if pkg else None
+
+	return bookings
+
+
+@frappe.whitelist()
+def get_booking_details(booking_id):
+	"""Get full details of a single booking including service execution."""
+	if frappe.session.user == "Guest":
+		frappe.throw(_("Please log in to view booking details."), frappe.AuthenticationError)
+
+	customer = _get_customer_for_user()
+	if not customer:
+		frappe.throw(_("Customer profile not found."))
+
+	booking = frappe.get_doc("Booking", booking_id)
+	if booking.customer_id != customer.name:
+		frappe.throw(_("You are not authorized to view this booking."), frappe.PermissionError)
+
+	# Get service package info
+	pkg = frappe.db.get_value(
+		"Service Package", booking.service_package,
+		["pack_name", "package_image", "service_name"], as_dict=True
+	) if booking.service_package else None
+
+	# Get service execution record (for rating/review and photos)
+	execution = frappe.get_all(
+		"Service Execution",
+		filters={"booking_id": booking.name},
+		fields=[
+			"name", "customer_rating", "customer_note",
+			"before_photo1", "before_photo2", "before_photo3",
+			"after_photo1", "after_photo2", "after_photo3"
+		],
+		limit=1
+	)
+
+	# Get payment info
+	payment = frappe.get_all(
+		"Payment",
+		filters={"booking_id": booking.name},
+		fields=["name", "payment_method", "payment_status", "amount"],
+		limit=1
+	)
+
+	return {
+		"booking": booking.as_dict(),
+		"pack_name": pkg.pack_name if pkg else booking.service_package,
+		"package_image": pkg.package_image if pkg else None,
+		"service_name": pkg.service_name if pkg else None,
+		"execution": execution[0] if execution else None,
+		"payment": payment[0] if payment else None
+	}
+
+
+@frappe.whitelist()
+def submit_booking_review(booking_id, rating, note=None):
+	"""Submit customer rating and note for a completed booking's service execution."""
+	if frappe.session.user == "Guest":
+		frappe.throw(_("Please log in to submit a review."), frappe.AuthenticationError)
+
+	customer = _get_customer_for_user()
+	if not customer:
+		frappe.throw(_("Customer profile not found."))
+
+	booking = frappe.get_doc("Booking", booking_id)
+	if booking.customer_id != customer.name:
+		frappe.throw(_("You are not authorized to review this booking."), frappe.PermissionError)
+
+	execution = frappe.get_all(
+		"Service Execution",
+		filters={"booking_id": booking_id},
+		fields=["name"],
+		limit=1
+	)
+
+	if not execution:
+		frappe.throw(_("Service execution record not found for this booking."))
+
+	exec_doc = frappe.get_doc("Service Execution", execution[0].name)
+	exec_doc.customer_rating = float(rating)
+	if note:
+		exec_doc.customer_note = note
+	exec_doc.save(ignore_permissions=True)
+
+	return {
+		"status": "success",
+		"execution_id": exec_doc.name,
+		"rating": exec_doc.customer_rating
 	}
 
 
@@ -328,10 +467,17 @@ def get_available_slots(date=None):
 
 
 @frappe.whitelist()
-def save_customer_address(houseflat_no, location, saved_as="Home", is_current=1, address_id=None):
-	"""Save or update customer address."""
+def save_customer_address(houseflat_no, location, pincode=None, saved_as="Home", is_current=1, address_id=None):
+	"""Save or update customer address with pincode validation."""
 	if frappe.session.user == "Guest":
 		frappe.throw(_("Please log in to manage addresses."), frappe.AuthenticationError)
+
+	# Validate Pincode Serviceability
+	if not pincode:
+		frappe.throw(_("Pincode is required."))
+	is_serviceable = frappe.db.get_value("Serviceable Pincode", {"pincode": str(pincode).strip(), "is_active": 1}, "name")
+	if not is_serviceable:
+		frappe.throw(_("Sorry, we currently do not serve the selected location (Pincode: {0}). We are expanding soon!").format(pincode))
 
 	customer = _get_customer_for_user()
 	if not customer:
@@ -364,6 +510,7 @@ def save_customer_address(houseflat_no, location, saved_as="Home", is_current=1,
 	if target_addr:
 		target_addr.houseflat_no = houseflat_no
 		target_addr.location = location
+		target_addr.pincode = str(pincode).strip()
 		target_addr.saved_as = saved_as or "Home"
 		target_addr.is_current = is_current_val
 	else:
@@ -371,6 +518,7 @@ def save_customer_address(houseflat_no, location, saved_as="Home", is_current=1,
 			"doctype": "Customer Address",
 			"houseflat_no": houseflat_no,
 			"location": location,
+			"pincode": str(pincode).strip(),
 			"saved_as": saved_as or "Home",
 			"is_current": is_current_val
 		})
@@ -566,3 +714,20 @@ def resolve_login_user(identifier):
 		return {"username": f"{clean_mobile}@servio.com"}
 
 	return {"username": clean}
+@frappe.whitelist(allow_guest=True)
+def get_pwa_sw():
+	"""Serve the Service Worker with the correct Service-Worker-Allowed header."""
+	import os
+	from werkzeug.wrappers import Response
+	
+	sw_path = frappe.get_app_path("servora", "public", "frontend", "sw.js")
+	data = "/* Service Worker not found or not built yet */"
+	if os.path.exists(sw_path):
+		with open(sw_path, "r") as f:
+			data = f.read()
+			
+	return Response(
+		data,
+		mimetype="application/javascript",
+		headers={"Service-Worker-Allowed": "/"}
+	)

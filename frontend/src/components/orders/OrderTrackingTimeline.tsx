@@ -61,6 +61,7 @@ export const OrderTrackingTimeline: React.FC<OrderTrackingTimelineProps> = ({
 
   const stateOrderMap: Record<OrderWorkflowState, number> = {
     'Draft': 0,
+    'Submitted': 0,
     'Payment Pending': 0,
     'Confirmed': 1,
     'Assigned': 2,

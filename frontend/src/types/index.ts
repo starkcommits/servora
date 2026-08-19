@@ -40,6 +40,7 @@ export interface AssignedWorker {
 
 export type OrderWorkflowState =
   | 'Draft'
+  | 'Submitted'
   | 'Payment Pending'
   | 'Confirmed'
   | 'Assigned'
@@ -56,14 +57,74 @@ export interface Order {
   modified: string;
   workflow_state: OrderWorkflowState;
   platform_fee: number;
+  subtotal: number;
   grand_total: number;
   scheduled_at: string | null;
-  payment_mode: 'CASH' | 'UPI' | null;
+  payment_mode: 'COD' | 'UPI' | null;
   payment_collected?: number;
   start_time?: string | null;
   finish_time?: string | null;
   items: CartItem[];
   assigned_worker?: AssignedWorker[];
+}
+
+export type BookingWorkflowState =
+  | 'Confirmed'
+  | 'Assigned'
+  | 'On The Way'
+  | 'Started'
+  | 'Completed'
+  | 'Customer Confirmed'
+  | 'Cancelled';
+
+export interface ServiceExecution {
+  name: string;
+  booking_id: string;
+  customer_rating?: number | null;
+  customer_note?: string | null;
+  before_photo1?: string | null;
+  before_photo2?: string | null;
+  before_photo3?: string | null;
+  after_photo1?: string | null;
+  after_photo2?: string | null;
+  after_photo3?: string | null;
+}
+
+export interface BookingPayment {
+  name: string;
+  payment_method: string;
+  payment_status: 'Pending' | 'Completed' | 'Failed';
+  amount: number;
+}
+
+export interface Booking {
+  name: string;
+  order_id: string;
+  service_package: string;
+  pack_name?: string;       // enriched by API
+  package_image?: string;   // enriched by API
+  service_name?: string;    // enriched by BookingDetails API
+  customer_id: string;
+  workflow_state: BookingWorkflowState;
+  scheduled_at: string | null;
+  base_price: number;
+  discounted_price: number;
+  platform_fee: number;
+  grand_total: number;
+  paid: number;
+  creation: string;
+  start_time?: string | null;
+  finish_time?: string | null;
+  assigned_worker?: AssignedWorker[];
+}
+
+export interface BookingDetails {
+  booking: Booking;
+  pack_name: string;
+  package_image: string | null;
+  service_name: string | null;
+  execution: ServiceExecution | null;
+  payment: BookingPayment | null;
 }
 
 export interface CustomerAddress {
@@ -88,10 +149,9 @@ export interface Customer {
 }
 
 export interface CustomerProfileStats {
-  total_orders: number;
-  completed_orders: number;
-  pending_orders: number;
-  refunded_orders?: number;
+  total_bookings: number;
+  active_bookings: number;
+  completed_bookings: number;
   saved_addresses_count?: number;
 }
 
@@ -128,5 +188,5 @@ export interface CodOrderResponse {
   workflow_state: OrderWorkflowState;
   grand_total: number;
   scheduled_at: string;
-  payment_mode: 'CASH';
+  payment_mode: 'COD';
 }

@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:booking_id",
  "creation": "2026-08-15 17:05:17.818684",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -31,8 +32,11 @@
   {
    "fieldname": "booking_id",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Booking ID",
-   "options": "Booking"
+   "options": "Booking",
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fieldname": "before_photos_section",
@@ -123,7 +127,7 @@
   },
   {
    "fieldname": "customer_note",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Customer Note"
   },
   {
@@ -134,10 +138,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-15 17:13:28.989078",
+ "modified": "2026-08-19 02:52:15.122203",
  "modified_by": "Administrator",
  "module": "Servora",
  "name": "Service Execution",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

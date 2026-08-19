@@ -320,13 +320,18 @@ export const ServicesPage: React.FC = () => {
             to="/cart"
             className="w-full bg-[#1C1C1C] text-white p-3.5 rounded-2xl shadow-xl flex items-center justify-between"
           >
-            <div className="flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-white text-[#1C1C1C] text-xs font-black flex items-center justify-center">
+            <div className="flex items-center gap-3">
+              <span className="w-7 h-7 rounded-full bg-white text-[#1C1C1C] text-xs font-black flex items-center justify-center shrink-0">
                 {itemsCount}
               </span>
-              <span className="text-sm font-bold">
-                ₹{Number(cart?.grand_total || 0).toLocaleString('en-IN')}
-              </span>
+              <div className="flex flex-col text-left">
+                <span className="text-[11px] text-[#A0A0A0] font-medium leading-none mb-1">
+                  {itemsCount === 1 ? '1 service added' : `${itemsCount} services added`}
+                </span>
+                <span className="text-[14px] font-bold leading-none">
+                  ₹{Number(cart?.grand_total || 0).toLocaleString('en-IN')}
+                </span>
+              </div>
             </div>
             <span className="text-xs font-bold uppercase tracking-wider">
               View Cart →

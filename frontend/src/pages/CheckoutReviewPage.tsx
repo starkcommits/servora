@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useCustomerProfile } from '../hooks/useCustomerProfile';
-import { useQueryClient } from '@tanstack/react-query';
 import { useFrappePostCall } from 'frappe-react-sdk';
 import { BillSummary } from '../components/cart/BillSummary';
 import { PaymentMethodSelector } from '../components/checkout/PaymentMethodSelector';
@@ -13,7 +12,6 @@ export const CheckoutReviewPage: React.FC = () => {
   const { cart } = useCart();
   const { profile } = useCustomerProfile();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const [paymentMethod, setPaymentMethod] = useState<'COD' | 'UPI'>('COD');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,6 +39,13 @@ export const CheckoutReviewPage: React.FC = () => {
       navigate('/checkout/slot');
       return;
     }
+
+    const scheduledDateStr = cart.scheduled_at.replace(' ', 'T');
+    const scheduledDate = new Date(scheduledDateStr);
+    if (scheduledDate < new Date()) {
+      setErrorMsg('The selected time slot has already passed. Please select a future date and time slot.');
+      return;
+    }
     try {
       setIsSubmitting(true);
       setErrorMsg(null);
@@ -49,7 +54,6 @@ export const CheckoutReviewPage: React.FC = () => {
         const res = await confirmCodCall({ order_id: confirmedOrderId });
         if (res?.message?.status === 'success') {
           navigate(`/orders/${encodeURIComponent(confirmedOrderId)}/success`, { state: { order: res.message } });
-          queryClient.invalidateQueries({ queryKey: ['cart'] });
         } else {
           setErrorMsg('Failed to confirm order. Please try again.');
         }

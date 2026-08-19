@@ -16,7 +16,7 @@ export const ServicePackageRow: React.FC<ServicePackageRowProps> = ({ pkg }) => 
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
 
-  const isAdded = hasItem(pkg.pack_name);
+  const isAdded = hasItem(pkg.name);
   const isLoggedIn = currentUser && currentUser !== 'Guest';
 
   const basePrice = Number(pkg.base_price || 0);
@@ -45,13 +45,13 @@ export const ServicePackageRow: React.FC<ServicePackageRowProps> = ({ pkg }) => 
       navigate('/login');
       return;
     }
-    await addToCart(pkg.pack_name);
+    await addToCart(pkg.name);
   };
 
   const handleRemove = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    await removeFromCart(pkg.pack_name);
+    await removeFromCart(pkg.name);
   };
 
   const imageUrl = pkg.package_image || '/service-collage.jpg';

@@ -1,4 +1,4 @@
-import { useFrappeGetDoc } from 'frappe-react-sdk';
+import { useFrappeGetDoc, useFrappeEventListener } from 'frappe-react-sdk';
 import { Order } from '../types';
 
 export function useOrderDetails(orderId?: string) {
@@ -8,9 +8,14 @@ export function useOrderDetails(orderId?: string) {
     orderId ? `order_${orderId}` : null,
     {
       revalidateOnFocus: true,
-      refreshInterval: 10000, // auto poll every 10s for live workflow tracking updates
     }
   );
+
+  useFrappeEventListener('order_updated', (event: any) => {
+    if (event.order_id === orderId) {
+      mutate();
+    }
+  });
 
   return {
     order: data,

@@ -4,9 +4,8 @@ import { Phone, Mail, MapPin } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
-    /* UC Footer: plain white or very light gray, black text, minimal */
-    <footer className="bg-[#FAFAFA] border-t border-[#E8E8E8] mt-auto">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-12">
+    <footer className="bg-dot-pattern border-t border-[#E8E8E8] mt-auto relative">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 pt-12 pb-24 md:pb-12 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
 
           {/* Brand */}

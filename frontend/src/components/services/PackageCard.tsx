@@ -14,7 +14,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({ pkg }) => {
   const { currentUser } = useFrappeAuth();
   const navigate = useNavigate();
 
-  const isAdded = hasItem(pkg.pack_name);
+  const isAdded = hasItem(pkg.name);
   const isLoggedIn = currentUser && currentUser !== 'Guest';
 
   const basePrice = Number(pkg.base_price || 0);
@@ -30,7 +30,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({ pkg }) => {
       navigate('/login');
       return;
     }
-    await addToCart(pkg.pack_name);
+    await addToCart(pkg.name);
   };
 
   const imageUrl = pkg.package_image || '/service-collage.jpg';

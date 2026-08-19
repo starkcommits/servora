@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useFrappeAuth, useFrappePostCall } from 'frappe-react-sdk';
-import { useQueryClient } from '@tanstack/react-query';
 import {
   Eye,
   EyeOff,
@@ -16,7 +15,6 @@ import {
 
 export const LoginPage: React.FC = () => {
   const { login, currentUser } = useFrappeAuth();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -101,8 +99,7 @@ export const LoginPage: React.FC = () => {
       }
 
       await login({ username: resolvedUsername, password: signInPassword });
-      await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      await queryClient.invalidateQueries({ queryKey: ['cart'] });
+      // Profile will be fetched automatically via SWR on reload
       window.location.href = getRedirectUrl();
     } catch {
       setErrorMsg('Incorrect email/mobile or password. Please try again.');
@@ -125,7 +122,7 @@ export const LoginPage: React.FC = () => {
       setErrorMsg(null);
       const res = await sendOtpCall({ mobile_number: cleanMobile });
       if (res?.message?.status === 'success') {
-        setSuccessMsg(`OTP sent to +91 ${cleanMobile} (Demo OTP: 123456)`);
+        setSuccessMsg(`OTP sent to +91 ${cleanMobile}`);
         setSignUpStep(2);
         setResendTimer(30);
         setOtpValues(['', '', '', '', '', '']);
@@ -239,8 +236,7 @@ export const LoginPage: React.FC = () => {
         } catch (loginErr) {
           console.warn('Frontend SDK login sync:', loginErr);
         }
-        await queryClient.invalidateQueries({ queryKey: ['profile'] });
-        await queryClient.invalidateQueries({ queryKey: ['cart'] });
+        // Profile will be fetched automatically via SWR on reload
         window.location.href = getRedirectUrl();
       } else {
         setErrorMsg('Failed to complete registration. Please try again.');
@@ -251,11 +247,6 @@ export const LoginPage: React.FC = () => {
       setIsSignUpLoading(false);
     }
   };
-
-  const demoAccounts = [
-    { label: 'Customer', user: '9876543210', pass: 'admin' },
-    { label: 'Admin', user: 'admin@gmail.com', pass: 'admin' },
-  ];
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center bg-white px-4 py-12">
@@ -466,7 +457,7 @@ export const LoginPage: React.FC = () => {
                   </div>
                   <p className="text-[11px] text-[#737373] mt-1.5 flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-[#059669]" />
-                    <span>We will send a 6-digit verification code (Fixed OTP: 123456)</span>
+                    <span>We will send a 6-digit verification code via SMS</span>
                   </p>
                 </div>
 
@@ -527,8 +518,7 @@ export const LoginPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[12px] px-1">
-                  <span className="text-[#737373]">Demo OTP: <strong>123456</strong></span>
+                <div className="flex items-center justify-end text-[12px] px-1">
                   {resendTimer > 0 ? (
                     <span className="text-[#737373]">Resend in {resendTimer}s</span>
                   ) : (
@@ -621,27 +611,6 @@ export const LoginPage: React.FC = () => {
             )}
           </div>
         )}
-
-        {/* Demo Login Shortcuts */}
-        <div className="mt-8 pt-6 border-t border-[#F0F0F0]">
-          <p className="text-[12px] text-center text-[#737373] mb-3">Quick demo login</p>
-          <div className="grid grid-cols-2 gap-2">
-            {demoAccounts.map((acc) => (
-              <button
-                key={acc.label}
-                type="button"
-                onClick={() => {
-                  setAuthMode('signin');
-                  setSignInIdentifier(acc.user);
-                  setSignInPassword(acc.pass);
-                }}
-                className="py-2.5 px-3 border border-[#E8E8E8] hover:border-[#1C1C1C] rounded-xl text-[12px] font-semibold text-[#525252] hover:text-[#1C1C1C] hover:bg-[#FAFAFA] transition-colors text-center"
-              >
-                {acc.label}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );
